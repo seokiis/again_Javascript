@@ -275,3 +275,124 @@ Codeit
 같은 의미에서 문자열에 splice 같은 메소드들은 사용할 수 없겠죠?
 
 ## 변수 Var
+
+자바스크립트에는 variable의 약자를 따서 var라는 키워드로 변수를 선언할 때가 있었습니다.
+자바스크립트에 변수를 선언하는 방식은 처음부터 let과 const가 아니였던 것이죠!
+
+그래서 오래된 프로젝트들이나 혹은 자바스크립트의 정보들을 정리해둔 조금 오랜 시간이 지난 블로그들을 살펴보면 심심찮게 var라는 키워드를 만나볼 수가 있는데요.
+
+### 중복 선언 허용
+
+var 키워드로 선언한 변수의 첫 번째 문제는, let과 const와는 다르게 **중복 선언이 가능**하다는 겁니다.
+똑같은 이름으로 변수를 한 번 더 선언하게 되면, 에러가 발생하는 것이 아니라 그냥 기존의 변수를 덮어써 버리는 것이죠. let키워드로 선언한 변수에 값을 재할당하는 것과는 엄연히 다릅니다.
+
+```jsx
+var myVariable = "codeit";
+console.log(myVariable);
+var myVariable = "Codeit!";
+console.log(myVariable);
+```
+
+```
+codeit
+Codeit!
+```
+
+이렇게 변수가 중복선언이 되면, 길고 복잡한 코드를 작성할 때 실수를 할 가능성이 커지고, 상황에 따라서는 치명적인 오류가 발생할 수 있습니다.
+
+### 함수 스코프
+
+var 키워드 변수가 사라진 두 번째 문제는 **Scope의 문제**입니다.
+let과 const 키워드로 선언한 변수는 if, for, function 등등 어떤 키워드와 관계없이 코드 블록, 즉 {} 중괄호로 감싸진 부분을 기준으로 scope를 갖게 되지만, var 키워드로 선언한 변수는 scope가 function에서만 구분되어 있습니다.
+
+```jsx
+{
+    let x = 3;
+}
+
+function myFunction() {
+    let y = 4;
+}
+
+console.log(x);
+console.log(y);
+```
+
+```
+Uncaught ReferenceError: x is not defined
+```
+
+let이나 const 키워드의 경우에는 중괄호로 감싸진 경우라면 모두 중괄호 밖에서는 지역 변수에 접근할 수 없습니다.
+
+```jsx
+{
+    var x = 3;
+}
+
+function myFunction() {
+    var y = 4;
+}
+
+console.log(x);
+console.log(y);
+```
+
+```
+3
+Uncaught ReferenceError: y is not defined
+```
+
+하지만 var 변수는 지역변수의 구분이 함수에만 있기 때문에 if, for, while, switch 등 다양한 상황에서 선언한 변수가 자칫, 전역변수의 역할을 하게 될 수도 있는 것이죠.
+
+참고로 이렇게 함수를 기준으로만 적용되는 스코프를 함수 스코프, 코드 블록을 기준으로 적용되는 스코프를 블록 스코프라는 용어를 사용한다는 점도 참고해 주세요!
+
+### 끌어올림 (Hoisting)
+
+```jsx
+console.log(myVariable);
+let myVariable;
+```
+
+```
+Uncaught ReferenceError: Cannot access 'myVariable' before initialization
+```
+
+let과 const로 선언한 변수는 선언되기 이전에 사용될 수 없습니다. 하지만, var 변수는 함수 스코프를 기준으로 선언되기 이전에도 변수에 접근이 가능한데요.
+
+```jsx
+console.log(myVariable);
+var myVariable;
+```
+
+```
+undefined
+```
+
+변수의 선언이 끌려 올라가서 마치, 2번째 줄과 첫 번째 줄이 바뀐 것처럼 동작하는 데요.
+
+```jsx
+console.log(myVariable);
+var myVariable = 2;
+console.log(myVariable);
+```
+
+```
+undefined
+2
+```
+
+하지만 이런 식으로 동작하는 방식은 코드의 흐름을 방해하기에 충분해 보이죠? 한 가지 주의해야 될 부분은, 함수를 선언할 때도 이 호이스팅이 적용됩니다.
+
+```jsx
+sayHi();
+
+function sayHi() {
+    console.log("hi");
+}
+```
+
+```
+hi
+```
+
+이런 현상은 함수를 한 번 선언하고 나면 어디서든 유연하게 사용할 수 있다는 장점이 있지만, 코드의 흐름에는 부정적인 영향을 끼칠 수 있습니다. 그래서 함수를 선언할 때는 가급적 코드 윗부분에 선언하거나, 호출을 항상 아래쪽에서 한다거나 나름대로 규칙을 세워서 코드를 작성하시기를 권장드립니다.
